@@ -14,5 +14,6 @@ ADD Gemfile* $APP_HOME/
 # Install bundle
 ENV BUNDLE_GEMFILE=$APP_HOME/Gemfile \
     BUNDLE_JOBS=${nproc:-7} \
-    BUNDLE_PATH=/bundle
-RUN bundle check || bundle install
+    BUNDLE_PATH=/gems
+#RUN bundle check || bundle install
+# RUN gem install sinatra
