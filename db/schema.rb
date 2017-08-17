@@ -10,23 +10,33 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170816220842) do
+ActiveRecord::Schema.define(version: 20170817092549) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "issues", force: :cascade do |t|
-    t.integer "number"
-    t.string "title"
+    t.integer  "number"
+    t.string   "title"
+    t.text     "text"
+    t.integer  "duration"
+    t.text     "source"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["number"], name: "index_issues_on_number", unique: true
+    t.index ["number"], name:      "index_issues_on_number", unique: true
+  end
+
+  create_table "issues_tracks", id: false, force: :cascade do |t|
+    t.bigint "issue_id"
+    t.bigint "track_id"
+    t.index ["issue_id"], name: "index_issues_tracks_on_issue_id"
+    t.index ["track_id"], name: "index_issues_tracks_on_track_id"
   end
 
   create_table "tracks", force: :cascade do |t|
-    t.string "artist"
-    t.string "title"
-    t.time "duration"
+    t.string   "artist"
+    t.string   "title"
+    t.time     "duration"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

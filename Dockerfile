@@ -12,8 +12,7 @@ WORKDIR $APP_HOME
 ADD Gemfile* $APP_HOME/
 
 # Install bundle
+RUN gem install bundler
 ENV BUNDLE_GEMFILE=$APP_HOME/Gemfile \
     BUNDLE_JOBS=${nproc:-7} \
     BUNDLE_PATH=/gems
-#RUN bundle check || bundle install
-# RUN gem install sinatra
