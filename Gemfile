@@ -25,6 +25,7 @@ gem 'puma', '~> 3.7'
 
 gem 'typhoeus', '~> 1.1', '>= 1.1.2'
 gem 'nokogiri', '~> 1.8'
+# gem 'unirest', '~> 1.1', '>= 1.1.2'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
