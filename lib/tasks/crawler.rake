@@ -1,4 +1,4 @@
-require_relative '../crawler/crawler'
+require_relative '../crawler/aerostatica'
 
 namespace :crawler do
   task scrap: :environment do

@@ -1,8 +1,9 @@
 require 'nokogiri'
 require 'typhoeus'
 require 'open-uri'
-require 'byebug'
+require 'pry'
 require 'yaml'
+require 'date'
 
 module Aerostatica
 
@@ -60,12 +61,34 @@ module Aerostatica
       fetch_volumes
     end
 
+    # Parsing
+
+    Issue = Struct.new(:title, :text, :source, :number, :duration, :date)
+
     def parse
-      p 'No parse yet'
+      p 'Parsing'
+
+      volumes = Dir.glob("#{VOLUMES_DIR}/*")
+      volumes.sample(2).each { |file|
+        return unless File.exists?(file)
+
+        document = File.open(file) { |f| Nokogiri::HTML(f, nil, 'UTF-8') }
+
+        issue = Issue.new
+        issue[:number] = document.xpath('//div[@id="blog"]//a[@class="volume-link"]').text.to_i
+        issue[:title] = document.xpath('/html/head/meta[@property="og:title"]/@content').text.strip
+        datetime = document.xpath('//div[@id="blog"]//time/@datetime').text.strip
+        issue[:date] = Date.parse(datetime)
+        issue[:source] = document.xpath('/html/head/meta[@property="og:url"]/@content').text.strip
+
+        # issue[:text] = document.xpath('//div[@id="main"]/article//div[@class="main-content-wrap"]')
+        puts issue
+        # binding.pry
+      }
     end
   end
 
 end
 
-Aerostatica.scrap
+# Aerostatica.scrap
 Aerostatica.parse
