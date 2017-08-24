@@ -3,6 +3,7 @@ require 'typhoeus'
 require 'open-uri'
 require 'pry'
 require 'yaml'
+require 'json'
 require 'date'
 
 module Aerostatica
@@ -64,26 +65,108 @@ module Aerostatica
     # Parsing
 
     Issue = Struct.new(:title, :text, :source, :number, :duration, :date)
+    Track = Struct.new(:artist, :title, :label)
 
     def parse
       p 'Parsing'
 
       volumes = Dir.glob("#{VOLUMES_DIR}/*")
-      volumes.sample(2).each { |file|
+      volumes[614..615].each { |file|
         return unless File.exists?(file)
 
         document = File.open(file) { |f| Nokogiri::HTML(f, nil, 'UTF-8') }
 
         issue = Issue.new
-        issue[:number] = document.xpath('//div[@id="blog"]//a[@class="volume-link"]').text.to_i
+        number = document.xpath('//div[@id="blog"]//a[@class="volume-link"]').text.to_i
+        issue[:number] = number
         issue[:title] = document.xpath('/html/head/meta[@property="og:title"]/@content').text.strip
         datetime = document.xpath('//div[@id="blog"]//time/@datetime').text.strip
         issue[:date] = Date.parse(datetime)
         issue[:source] = document.xpath('/html/head/meta[@property="og:url"]/@content').text.strip
 
+        content = document.xpath('//div[@id="main"]/article//div[@class="main-content-wrap"]/*')
+
+        text = []
+
+        tracks = []
+
+        content.each { |n|
+          # drop headers
+          # next if n.name == "h2"
+          next if n.name == 'div' && n.attribute('class').value == 'aplayer'
+
+          case n.name
+            when 'p'
+              text.push({
+                content: n.child.inner_html
+              })
+              # if n.child.name == 'em'
+              #   # puts "It's em paragraph"
+              #   text.push({
+              #     node: 'em',
+              #     content: n.child.inner_html
+              #   })
+              # elsif n.child.name == 'text'
+              #   # puts "It's paragraph"
+              #   text.push({
+              #     node: 'p',
+              #     content: n.text
+              #   })
+              # else
+              #   puts "!!! OH WORNG PARA : #{n.child.name} : #{number}"
+              # end
+            when 'div'
+              classname = n.attribute('class').value
+              if n.attribute('class').value.include?('figure')
+                # puts "oh thats picture"
+              else
+                puts "div but unknown: #{n.name} : #{number}"
+                puts n.attribute('class')
+                # puts n
+              end
+            when 'ul'
+              # puts "Song link"
+            when 'ol'
+              # parse songs
+              n.xpath('li/a').each do |index_node|
+                # label = index_node.attribute('href').value.sub('#', '')
+                raw_name = index_node.text.split(/(?:\s|[^[:ascii:]])+(?:-|\u{2013})(?:\s|[^[:ascii:]])+/, 2)
+                artist, title = raw_name
+
+                if raw_name.size != 2
+                  # binding.pry
+                  puts "#{number} :: #{index_node.text} :: #{label}"
+                  # puts track
+                end
+
+                # track label
+                new_label = "#{artist} #{title}".gsub(/[^[:alnum:]]+/, '-').gsub(/(?:^-)|(?:-$)/, '').downcase
+                # puts "#{artist} #{title}"
+                # puts new_label
+                #
+                label = new_label
+
+                track = Track.new(artist, title, label)
+                tracks << track
+
+              end
+              # binding.pry
+              # puts "Songs index"
+            when 'h2'
+              # skip hr
+              next
+            when 'hr'
+              # skip hr
+              next
+            else
+              puts "!!! SOMETHING GOES WRONG : #{n.name} : #{number}"
+          end
+        }
+
+        puts tracks
+
         # issue[:text] = document.xpath('//div[@id="main"]/article//div[@class="main-content-wrap"]')
-        puts issue
-        # binding.pry
+        # puts text.to_json
       }
     end
   end
