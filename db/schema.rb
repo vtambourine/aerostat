@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170823210103) do
+ActiveRecord::Schema.define(version: 20170825094929) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 20170823210103) do
     t.integer "duration"
     t.text "source"
     t.date "date"
+    t.boolean "is_reviewed", default: false
     t.index ["number"], name: "index_issues_on_number", unique: true
   end
 
@@ -40,6 +41,10 @@ ActiveRecord::Schema.define(version: 20170823210103) do
     t.time "duration"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "label"
+    t.string "error"
+    t.boolean "is_reviewed", default: false
+    t.index ["artist", "title"], name: "index_tracks_on_artist_and_title"
   end
 
 end

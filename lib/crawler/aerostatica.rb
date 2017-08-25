@@ -6,11 +6,13 @@ require 'yaml'
 require 'json'
 require 'date'
 
+class ParsingError < StandardError; end
+
 module Aerostatica
 
-  OUTPUR_DIR = 'tmp/crawler/aerostatica'
-  INDEX_LINKS_FILE = File.join(OUTPUR_DIR, 'index.yml')
-  VOLUMES_DIR = File.join(OUTPUR_DIR, 'volumes')
+  OUTPUT_DIR = 'tmp/crawler/aerostatica'
+  INDEX_LINKS_FILE = File.join(OUTPUT_DIR, 'index.yml')
+  VOLUMES_DIR = File.join(OUTPUT_DIR, 'volumes')
   INDEX_URI = 'http://aerostatica.ru/all-volumes/'
 
   class << self
@@ -55,7 +57,7 @@ module Aerostatica
     end
 
     def scrap
-      FileUtils.mkdir_p(OUTPUR_DIR)
+      FileUtils.mkdir_p(OUTPUT_DIR)
       FileUtils.mkdir_p(VOLUMES_DIR)
 
       fetch_index unless File.file?(INDEX_LINKS_FILE)
@@ -64,32 +66,62 @@ module Aerostatica
 
     # Parsing
 
-    Issue = Struct.new(:title, :text, :source, :number, :duration, :date)
-    Track = Struct.new(:artist, :title, :label)
+    def parse_episode_meta(document)
+      number = document.xpath('//div[@id="blog"]//a[@class="volume-link"]').text.to_i
+      raise ParsingError, "Episode number is missing" if number <= 0
+      episode = Issue.find_or_initialize_by(number: number)
+      return episode if episode.is_reviewed?
+      episode.title  = document.xpath('/html/head/meta[@property="og:title"]/@content').text.strip
+      episode.date   = Date.parse(document.xpath('//div[@id="blog"]//time/@datetime').text.strip)
+      episode.source = document.xpath('/html/head/meta[@property="og:url"]/@content').text.strip
+
+      episode
+    end
+
+    def parse_track_list(node)
+      node.xpath('li/a').each do |index_node|
+        track = parse_track(index_node)
+        if block_given?
+          yield track
+        end
+        track.save
+      end
+    end
+
+    def parse_track(node)
+      track_name = node.text
+      track_name_parts = track_name.split(/(?:\s|\u{200e})+(?:-|\u{2013})(?:\s|\u{200e})+/, 2)
+      artist, title = track_name_parts
+      error = nil
+      if track_name_parts.size > 2
+        error = "Weird track name format: #{track_name}"
+      elsif title.nil?
+        error = "Track title is missing: #{track_name}"
+      elsif artist.nil?
+        error = "Track artist is missing: #{track_name}"
+      end
+      track = Track.find_or_initialize_by(artist: artist, title: title)
+
+      return track if track.is_reviewed?
+
+      track.label = "#{artist} #{title}".gsub(/[^[:alnum:]]+/, '-').gsub(/(?:^-)|(?:-$)/, '').downcase
+      track.error = error unless error.nil?
+      track
+    end
 
     def parse
-      p 'Parsing'
-
       volumes = Dir.glob("#{VOLUMES_DIR}/*")
-      volumes[614..615].each { |file|
+      volumes[612..613].each { |file|
         return unless File.exists?(file)
 
-        document = File.open(file) { |f| Nokogiri::HTML(f, nil, 'UTF-8') }
+        document = File.open(file) { |html| Nokogiri::HTML(html, nil, 'UTF-8') }
+        # Parse episode meta information, except content
+        episode = parse_episode_meta(document)
+        return if episode.is_reviewed?
 
-        issue = Issue.new
-        number = document.xpath('//div[@id="blog"]//a[@class="volume-link"]').text.to_i
-        issue[:number] = number
-        issue[:title] = document.xpath('/html/head/meta[@property="og:title"]/@content').text.strip
-        datetime = document.xpath('//div[@id="blog"]//time/@datetime').text.strip
-        issue[:date] = Date.parse(datetime)
-        issue[:source] = document.xpath('/html/head/meta[@property="og:url"]/@content').text.strip
-
-        content = document.xpath('//div[@id="main"]/article//div[@class="main-content-wrap"]/*')
-
+        # Parse episode content
         text = []
-
-        tracks = []
-
+        content = document.xpath('//div[@id="main"]/article//div[@class="main-content-wrap"]/*')
         content.each { |n|
           # drop headers
           # next if n.name == "h2"
@@ -97,24 +129,7 @@ module Aerostatica
 
           case n.name
             when 'p'
-              text.push({
-                content: n.child.inner_html
-              })
-              # if n.child.name == 'em'
-              #   # puts "It's em paragraph"
-              #   text.push({
-              #     node: 'em',
-              #     content: n.child.inner_html
-              #   })
-              # elsif n.child.name == 'text'
-              #   # puts "It's paragraph"
-              #   text.push({
-              #     node: 'p',
-              #     content: n.text
-              #   })
-              # else
-              #   puts "!!! OH WORNG PARA : #{n.child.name} : #{number}"
-              # end
+              text.push(n.child.inner_html)
             when 'div'
               classname = n.attribute('class').value
               if n.attribute('class').value.include?('figure')
@@ -128,30 +143,9 @@ module Aerostatica
               # puts "Song link"
             when 'ol'
               # parse songs
-              n.xpath('li/a').each do |index_node|
-                # label = index_node.attribute('href').value.sub('#', '')
-                raw_name = index_node.text.split(/(?:\s|[^[:ascii:]])+(?:-|\u{2013})(?:\s|[^[:ascii:]])+/, 2)
-                artist, title = raw_name
-
-                if raw_name.size != 2
-                  # binding.pry
-                  puts "#{number} :: #{index_node.text} :: #{label}"
-                  # puts track
-                end
-
-                # track label
-                new_label = "#{artist} #{title}".gsub(/[^[:alnum:]]+/, '-').gsub(/(?:^-)|(?:-$)/, '').downcase
-                # puts "#{artist} #{title}"
-                # puts new_label
-                #
-                label = new_label
-
-                track = Track.new(artist, title, label)
-                tracks << track
-
+              parse_track_list(n) do |track|
+                episode.tracks << track
               end
-              # binding.pry
-              # puts "Songs index"
             when 'h2'
               # skip hr
               next
@@ -163,15 +157,10 @@ module Aerostatica
           end
         }
 
-        puts tracks
-
-        # issue[:text] = document.xpath('//div[@id="main"]/article//div[@class="main-content-wrap"]')
-        # puts text.to_json
+        episode.text = text
+        episode.save
       }
     end
   end
 
 end
-
-# Aerostatica.scrap
-Aerostatica.parse
