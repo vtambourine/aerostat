@@ -5,4 +5,8 @@ class Volume < ApplicationRecord
   def permalink
     # volume_url(self)
   end
+
+  def self.search(query)
+    where('name LIKE ?', "%#{search}%")
+  end
 end

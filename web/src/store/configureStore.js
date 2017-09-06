@@ -15,8 +15,6 @@ const configureStore = (preloadedState = {}) => {
     )
   );
 
-  console.log('is module hot?', module.hot);
-
   return store;
 };
 

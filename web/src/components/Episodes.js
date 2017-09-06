@@ -1,17 +1,9 @@
 import React, { Component } from 'react';
-import { loadEpisodes } from '../actions';
 
 class Episodes extends Component {
   static defaultProps = {
-    episodes: [
-      { id: 1, title: "Alpha" },
-      { id: 2, title: "Beta" }
-    ]
-  }
-
-  fetchEpisodes() {
-    this.props.dispatch(loadEpisodes())
-    console.log(this.state);
+    offset: 0,
+    count: 10
   }
 
   renderEpisode(episode) {
@@ -28,18 +20,32 @@ class Episodes extends Component {
     );
   }
 
-  render() {
+  renderLoader() {
     return (
-      <div className="Episodes">
-        <h3>Here will be episodes</h3>
-        {this.props.episodes.sort((a, b) => {
-          return parseInt(a.id) > parseInt(b.id) ? 1 : -1
-        }).map(this.renderEpisode.bind(this))}
-        <button onClick={this.fetchEpisodes.bind(this)}>
-          Fetch!
-        </button>
+      <div className="Episodes-loader">
+        Loading...
       </div>
     );
+  }
+
+  render() {
+    const { isFetching, episodes, offset, count } = this.props;
+    const isEmpty = episodes.lenght === 0;
+
+    if (isFetching && isEmpty) {
+      return this.renderLoader();
+    } else {
+      return (
+        <div className="Episodes">
+          {this.props.episodes
+            .slice(offset, offset + count)
+            .map(this.renderEpisode.bind(this))}
+          <div>
+            <button onClick={this.props.onNextClick}>Show next</button>
+          </div>
+        </div>
+      );
+    }
   }
 }
 

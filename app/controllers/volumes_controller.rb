@@ -3,15 +3,13 @@ class VolumesController < ApplicationController
 
   # GET /volumes
   def index
-    @volumes = Volume.all
+    order = params.fetch(:order, :desc)
+    @volumes = Volume.order(id: order)
 
     render json: @volumes.as_json(
       methods: :permalink,
-      only: [
-        :id,
-        :number,
-        :title,
-        :published_at
+      only: [ :id, :number,
+        :title, :published_at
       ]
     ).map { |v|
       if v["id"]
@@ -27,26 +25,15 @@ class VolumesController < ApplicationController
   # GET /volumes/1
   def show
     render json: @volume.as_json(
-      only: [
-        :id,
-        :number,
-        :title,
-        :text,
-        :published_at,
-        :aquarium_url,
-        :aerostatica_url
+      only: [ :id, :number, :title, :text,
+        :published_at, :aquarium_url, :aerostatica_url
       ],
       include: {
         tracks: {
-          only: [
-            :artist,
-            :title
-          ],
+          only: [ :artist, :title ],
           include: {
             artist: {
-              only: [
-                :name
-              ]
+              only: [ :name ]
             }
           }
         }
@@ -62,6 +49,6 @@ class VolumesController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def volume_params
-      params.require(:volume).permit(:number, :title)
+      params.require(:volume).permit(:number, :title, :order)
     end
 end
