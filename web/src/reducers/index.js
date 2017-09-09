@@ -17,10 +17,22 @@ const query = (state = '', action) => {
   }
 };
 
-const episodes = (state = [], action) => {
+const episodes = (state = {
+  isFetching: false,
+  items: []
+}, action) => {
   switch (action.type) {
+    case EPISODES_REQUEST:
+      return {
+        ...state,
+        isFetching: true
+      }
     case EPISODES_SUCCESS:
-      return [].concat(action.response);
+      return {
+        ...state,
+        isFetching: false,
+        items: [].concat(action.response)
+      };
     default:
       return state;
   }

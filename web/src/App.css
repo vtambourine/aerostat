@@ -1,26 +1,76 @@
 .App {
-  text-align: center;
 }
 
 .App-logo {
-  animation: App-logo-spin infinite 20s linear;
   height: 80px;
 }
 
 .App-header {
   background-color: #222;
-  height: 150px;
+  height: 60px;
   padding: 20px;
   color: white;
+  text-align: center;
 }
 
-.App-intro {
-  font-size: large;
+.Search {
+  position: relative;
+  width: 800px;
+  margin: 30px auto;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.Search-label {
+  position: absolute;
+  content: '';
+  line-height: 62px;
+  left: 0;
+  top: 0;
+  font-size: 42px;
+  color: gray;
+  line-height: 62px;
+}
+
+.Search-input-holder {
+  height: 75px;
+}
+
+.Search-input {
+  font-size: 28px;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 12px;
+  margin-left: 40px;
+  padding: 0.51em 0.38em;
+  border-width: 0 0 1px;
+  border-style: solid;
+  border-color: #ccc;
+
+  transition: border 0.3s;
+}
+
+.Search-input::placeholder {
+  color: #ccc;
+}
+
+.Search-input:focus {
+  border-color: red;
+  border-bottom-width: 4px;
+  outline: none;
+}
+
+.Search-examples {
+  font-size: 18px;
+}
+
+.Search-example {
+  color: blue;
+  border-bottom: 3px solid blue;
+}
+
+.Episodes {
+  width: 800px;
+  margin: 0 auto;
 }
 
 .Episode {

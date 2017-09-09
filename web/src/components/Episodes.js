@@ -29,18 +29,21 @@ class Episodes extends Component {
   }
 
   render() {
-    const { isFetching, episodes, offset, count } = this.props;
+    const { offset, count } = this.props;
+    const { isFetching, items } = this.props.episodes;
+    const episodes = items;
     const isEmpty = episodes.lenght === 0;
 
-    if (isFetching && isEmpty) {
+    if (isFetching || isEmpty) {
       return this.renderLoader();
     } else {
       return (
         <div className="Episodes">
-          {this.props.episodes
+          {episodes
             .slice(offset, offset + count)
             .map(this.renderEpisode.bind(this))}
           <div>
+            <button onClick={this.props.onPrevtClick}>Show previous</button>
             <button onClick={this.props.onNextClick}>Show next</button>
           </div>
         </div>
