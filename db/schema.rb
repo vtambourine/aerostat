@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170903210808) do
+ActiveRecord::Schema.define(version: 20170910195035) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,29 @@ ActiveRecord::Schema.define(version: 20170903210808) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name_hash"], name: "index_artists_on_name_hash", unique: true
+  end
+
+  create_table "episodes", force: :cascade do |t|
+    t.integer "number"
+    t.string "title"
+    t.string "raw_title"
+    t.date "published_at"
+    t.text "text"
+    t.integer "duration"
+    t.string "aquarium_url"
+    t.string "aerostatica_url"
+    t.string "title_hash"
+    t.boolean "is_reviewed", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["number"], name: "index_episodes_on_number", unique: true
+  end
+
+  create_table "episodes_tracks", id: false, force: :cascade do |t|
+    t.bigint "track_id"
+    t.bigint "episode_id"
+    t.index ["episode_id"], name: "index_episodes_tracks_on_episode_id"
+    t.index ["track_id"], name: "index_episodes_tracks_on_track_id"
   end
 
   create_table "tracks", force: :cascade do |t|
@@ -38,29 +61,6 @@ ActiveRecord::Schema.define(version: 20170903210808) do
     t.datetime "updated_at", null: false
     t.index ["artist_id", "title"], name: "index_tracks_on_artist_and_title"
     t.index ["artist_id"], name: "index_tracks_on_artist_id"
-  end
-
-  create_table "tracks_volumes", id: false, force: :cascade do |t|
-    t.bigint "track_id"
-    t.bigint "volume_id"
-    t.index ["track_id"], name: "index_tracks_volumes_on_track_id"
-    t.index ["volume_id"], name: "index_tracks_volumes_on_issue_id"
-  end
-
-  create_table "volumes", force: :cascade do |t|
-    t.integer "number"
-    t.string "title"
-    t.string "raw_title"
-    t.date "published_at"
-    t.text "text"
-    t.integer "duration"
-    t.string "aquarium_url"
-    t.string "aerostatica_url"
-    t.string "title_hash"
-    t.boolean "is_reviewed", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["number"], name: "index_volumes_on_number", unique: true
   end
 
 end

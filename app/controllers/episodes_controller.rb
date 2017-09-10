@@ -1,12 +1,12 @@
-class VolumesController < ApplicationController
+class EpisodesController < ApplicationController
   before_action :set_volume, only: [:show, :update, :destroy]
 
-  # GET /volumes
+  # GET /episodes
   def index
     order = params.fetch(:order, :desc)
-    @volumes = Volume.order(id: order)
+    @episodes = Episode.order(id: order)
 
-    render json: @volumes.as_json(
+    render json: @episodes.as_json(
       methods: :permalink,
       only: [ :id, :number,
         :title, :published_at
@@ -14,7 +14,7 @@ class VolumesController < ApplicationController
     ).map { |v|
       if v["id"]
         v.merge({
-          url: volume_url(v["id"])
+          url: episode_url(v["id"])
         })
       else
         v
@@ -22,9 +22,9 @@ class VolumesController < ApplicationController
     }
   end
 
-  # GET /volumes/1
+  # GET /episodes/1
   def show
-    render json: @volume.as_json(
+    render json: @episode.as_json(
       only: [ :id, :number, :title, :text,
         :published_at, :aquarium_url, :aerostatica_url
       ],
@@ -38,17 +38,17 @@ class VolumesController < ApplicationController
           }
         }
       }
-    ).merge({url: volume_url(@volume)})
+    ).merge({url: episode_url(@episode)})
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_volume
-      @volume = Volume.find(params[:id])
+    def set_episode
+      @episode = Episode.find(params[:id])
     end
 
     # Only allow a trusted parameter "white list" through.
-    def volume_params
-      params.require(:volume).permit(:number, :title, :order)
+    def episode_params
+      params.require(:episode).permit(:number, :title, :order)
     end
 end

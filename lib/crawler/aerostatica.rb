@@ -117,7 +117,7 @@ module Aerostatica
         number = document.xpath('//div[@id="blog"]//a[@class="volume-link"]').text.to_i
         raise ParsingError, "Episode number is missing" if number <= 0
 
-        episode = Volume.find_or_initialize_by(id: number)
+        episode = Episode.find_or_initialize_by(id: number)
         return episode if episode.is_reviewed?
 
         episode.number = number
@@ -213,7 +213,7 @@ module Aerostatica
         episode.text = text.to_json
         episode.save
 
-        p "Volume #{file} parsed!"
+        p "Episode #{file} parsed!"
       end
     end
   end
