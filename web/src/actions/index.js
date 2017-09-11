@@ -15,6 +15,21 @@ export const loadEpisodes = () => (dispatch) => {
   return dispatch(fetchEpisodes());
 };
 
+export const ARTISTS_REQUEST = 'ARTISTS_REQUEST';
+export const ARTISTS_SUCCESS = 'ARTISTS_SUCCESS';
+export const ARTISTS_FAILURE = 'ARTISTS_FAILURE';
+
+export const loadArtists = () => {
+  return {
+    type: ARTISTS_SUCCESS,
+    response: [
+      { name: 'Iron Maiden', episodes: [1, 4, 5] },
+      { name: 'Queen', episodes: [1, 4, 5] },
+      { name: 'Bob Dylan', episodes: [1, 4, 5] }
+    ]
+  }
+}
+
 export const SEARCH_QUERY_CHANGE = 'SEARCH_QUERY_CHANGE';
 
 export const changeQuery = (query) => ({

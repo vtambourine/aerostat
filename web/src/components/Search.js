@@ -6,10 +6,6 @@ class Search extends Component {
     onChange: () => {}
   }
 
-  componentDidMount() {
-    console.log(this.refs);
-  }
-
   onExampleClick(event) {
     event.target.value = event.target.innerText;
     this.props.onChange.apply(this, arguments);

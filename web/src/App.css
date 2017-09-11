@@ -15,8 +15,12 @@ h1, h2, h3 {
 .App {
 }
 
-.App-header {
+.App--content {
   width: 800px;
+  margin: 0 auto;
+}
+
+.App-header {
   margin: 20px auto 40px;
   /*border-style: solid;*/
   /*border-width: 6px;*/
@@ -41,7 +45,6 @@ h1, h2, h3 {
 }
 
 .Search {
-  width: 800px;
   margin: 30px auto;
 }
 

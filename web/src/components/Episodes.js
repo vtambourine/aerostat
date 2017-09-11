@@ -30,15 +30,18 @@ class Episodes extends Component {
 
   render() {
     const { offset, count } = this.props;
-    const { isFetching, items } = this.props.episodes;
-    const episodes = items;
+    const { isFetching, items, filteredItems } = this.props.episodes;
+    const episodes = filteredItems;
     const isEmpty = episodes.lenght === 0;
+
+    // console.log(this.props.episodes);
 
     if (isFetching || isEmpty) {
       return this.renderLoader();
     } else {
       return (
         <div className="Episodes">
+          <div>Всего эпизодов: {episodes.length}</div>
           {episodes
             .slice(offset, offset + count)
             .map(this.renderEpisode.bind(this))}
