@@ -27,7 +27,7 @@ class App extends Component {
     return (
       <div className="App">
         <div className="App-header">
-          <h2>Aerostat</h2>
+          <h1 className="App-title">Аэростат</h1>
         </div>
         <Search
           query={this.props.query}

@@ -6,6 +6,10 @@ class Search extends Component {
     onChange: () => {}
   }
 
+  componentDidMount() {
+    console.log(this.refs);
+  }
+
   onExampleClick(event) {
     event.target.value = event.target.innerText;
     this.props.onChange.apply(this, arguments);
@@ -14,16 +18,6 @@ class Search extends Component {
   render() {
     return (
       <div className="Search">
-        <div className="Search-input-holder">
-          <label className="Search-label">
-            ∅
-          </label>
-          <input className="Search-input"
-            type="text"
-            value={this.props.query}
-            onChange={this.props.onChange}
-            placeholder="Поиск"/>
-        </div>
         <div className="Search-examples">
           {'Например, '}
           <span className="Search-example"
@@ -35,6 +29,15 @@ class Search extends Component {
             onClick={this.onExampleClick.bind(this)}>
             Bob Dylan
           </span>
+        </div>
+        <div className="Search-input-holder">
+          <input className="Search-input"
+            ref="search"
+            type="text"
+            value={this.props.query}
+            onChange={this.props.onChange}
+            placeholder="Поиск"
+            autoFocus />
         </div>
       </div>
     )

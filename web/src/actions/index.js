@@ -7,7 +7,7 @@ export const EPISODES_FAILURE = 'EPISODES_FAILURE';
 const fetchEpisodes = () => ({
   [CALL_API]: {
     types: [ EPISODES_REQUEST, EPISODES_SUCCESS, EPISODES_FAILURE ],
-    endpoint: 'volumes?order=desc'
+    endpoint: 'episodes?order=desc'
   }
 });
 
