@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+
+  nginx:
+    image: nginx:1.13
+    volumes:
+      - app
+    depends_on:
+      - app
+    ports:
+      - 81:80
+
+  app:
+    build:
+      context: .
+      dockerfile: containers/production/Dockerfile
+    env_file:
+      - containers/production/.env
+    volumes:
+      - assets:/app/public/assets
+      - nginx_config:/etc/nginx/conf.d
+    depends_on:
+      - db
+    ports:
+      - 3000:3000
+
+  db:
+    image: postgres:9.6
+    ports:
+      - 5432:5432
+    env_file:
+      - containers/production/.env
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+
+volumes:
+  db_volume:
+  assets:
+  nginx_config:
