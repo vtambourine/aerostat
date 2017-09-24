@@ -23,13 +23,12 @@ gem 'puma', '~> 3.7'
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'
 
-gem 'typhoeus', '~> 1.1', '>= 1.1.2'
-gem 'nokogiri', '~> 1.8'
+# gem 'typhoeus', '~> 1.1', '>= 1.1.2'
+# gem 'nokogiri', '~> 1.8'
 # gem 'unirest', '~> 1.1', '>= 1.1.2'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  # gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'pry', '~> 0.10.4'
 end
 
