@@ -18,6 +18,7 @@ class Artists extends Component {
   render() {
     return (
       <div className="Artists">
+        {'Here will be artists'}
         {this.props.items.map(this.renderArtist.bind(this))}
       </div>
     )

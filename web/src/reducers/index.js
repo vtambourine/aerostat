@@ -1,4 +1,6 @@
 import { combineReducers } from 'redux';
+import { createSelector } from 'reselect';
+
 import {
   EPISODES_REQUEST,
   EPISODES_SUCCESS,
@@ -58,6 +60,10 @@ const episodes = (state = {
         ...state,
         isFetching: false,
         items: [].concat(action.response),
+        itemsByNumber: action.response.reduce((result, episode) => {
+          result[episode.number] = episode;
+          return result;
+        }, {}),
         filteredItems: filterEpisodes(state.query, action.response)
       };
     case SEARCH_QUERY_CHANGE:

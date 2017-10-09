@@ -24,8 +24,8 @@ export const loadArtists = () => {
     type: ARTISTS_SUCCESS,
     response: [
       { name: 'Iron Maiden', episodes: [1, 4, 5] },
-      { name: 'Queen', episodes: [1, 4, 5] },
-      { name: 'Bob Dylan', episodes: [1, 4, 5] }
+      { name: 'Queen', episodes: [10, 40, 50] },
+      { name: 'Bob Dylan', episodes: [100, 400, 500] }
     ]
   }
 }

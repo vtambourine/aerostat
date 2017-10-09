@@ -3,13 +3,16 @@ import { connect } from 'react-redux';
 import Episodes from './components/Episodes';
 import Artists from './components/Artists';
 import Search from './components/Search';
+import LatestEpisode from './components/LatestEpisode';
 import {
   loadEpisodes,
   loadArtists,
   changeQuery,
   showMoreEpisodes
 } from './actions';
-import logo from './logo.svg';
+
+import { getVisibleArtists } from './modules/artists.js';
+
 import './App.css';
 
 class App extends Component {
@@ -33,6 +36,7 @@ class App extends Component {
           <div className="App-header">
             <h1 className="App-title">Аэростат</h1>
           </div>
+          <LatestEpisode episode={this.props.episodes[0]} />
           <Search
             query={this.props.query}
             onChange={this.handleSearchChange.bind(this)} />
@@ -44,7 +48,7 @@ class App extends Component {
 
           <Artists
             isFetching={this.props.artists.isFetching}
-            items={this.props.artists.items} />
+            items={this.props.artists} />
         </div>
       </div>
     );
@@ -56,7 +60,7 @@ const mapStateToProps = (state) => {
   return {
     query,
     episodes,
-    artists,
+    artists: getVisibleArtists(state),
     episodesOffset: pagination.offset
   }
 };
